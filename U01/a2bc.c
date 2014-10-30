@@ -1,3 +1,5 @@
+// Tobias Lohse, Sven Klaus, Luisa Castano Jurado
+
 #include <stdio.h>
 
 double cel2fahr(double cel)
