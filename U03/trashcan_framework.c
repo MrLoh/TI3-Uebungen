@@ -51,7 +51,7 @@ int copy(char *source, char *target)
 char* getpath(char *foldername, char *filename)
 {
 	ssize_t length = strlen(foldername)+strlen(filename)+2;
-	char *path = (char*) malloc(length);
+	char* path = malloc(length);
 	strcpy(path, foldername);
 	strcat(path, "/");
 	strcat(path, filename);
@@ -76,7 +76,7 @@ int setup_trashcan(char *foldername)
 int put_file(char *foldername, char *filename)
 {
 	char *source = filename;
-	char *target = getpath(foldername, filename);
+	char *target = (foldername, filename);
 	int err;
 
 	if ( err = copy(source, target), err < 0 )
@@ -87,7 +87,7 @@ int put_file(char *foldername, char *filename)
 			case -3: return -2;
 		}
 	}
-	if ( remove(source) == -1)
+	if ( unlink(source) == -1)
 		return -3;
 	return 0;
 }
@@ -108,8 +108,9 @@ int get_file(char *foldername, char *filename)
 			case -3: return -2;
 		}
 	}
-	if ( remove(source) == -1)
+	if ( unlink(source) == -1)
 		return -3;
+	free(source);
 	return 0;
 }
 
@@ -117,8 +118,9 @@ int get_file(char *foldername, char *filename)
 int remove_file(char *foldername, char *filename)
 {
 	char *path = getpath(foldername, filename);
-	if ( remove(path) == -1 )
+	if ( unlink(path) == -1 )
 		return -1;
+	free(path);
 	return 0;
 }
 
