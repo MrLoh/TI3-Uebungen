@@ -169,6 +169,8 @@ void mergeFreeBlocks()
         {
             block->dataLength = block->dataLength + block->nextBlock->dataLength;
             block->nextBlock = block->nextBlock->nextBlock;
+            if(block->nextBlock == NULL)
+                return;
         }
         block = block->nextBlock;
     }

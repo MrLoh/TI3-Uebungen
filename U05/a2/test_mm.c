@@ -6,55 +6,50 @@ int main(int argc, char* argv[])
 {
 	status();
 
-	int *a = (int*)my_malloc(sizeof(int));
-	*a = 5;
 	printf(">> int *a (int*)my_malloc(sizeof(int))\n");
+	int *a = (int*)my_malloc(sizeof(int));
 	printf(">> *a = %d\n\n",*a);
+	*a = 5;
 	status();
 
-	char* b = (char*)my_malloc(16);
-	b[0] = 'c';
-	b[1] = 'o';
-	b[2] = 'o';
-	b[3] = 'l';
-	b[4] = '\0';
 	printf(">> char* b = (char*)my_malloc(256)\n");
+	char* b = (char*)my_malloc(16);
 	printf(">> *b = '%s'\n\n",b);
+	b[0] = 'c'; b[1] = 'o'; b[2] = 'o'; b[3] = 'l'; b[4] = '\0';
 	status();
 
-
-	char* c = (char*)my_malloc(256);
 	printf(">> char* c = (char*)my_malloc(256)\n\n");
+	char* c = (char*)my_malloc(256);
 	status();
 
-	char* d = (char*)my_malloc(9728);
-	d[9727] = '\0';
 	printf(">> char* d = (char*)my_malloc(9728)\n");
+	char* d = (char*)my_malloc(9728);
 	printf(">> d[9959] = '%c' \n\n", d[9727]);
+	d[9727] = '\0';
 	status();
 
-	my_free((void*)b);
 	printf(">> my_free(b)\n\n");
+	my_free((void*)b);
 	status();
 
-	my_free((void*) d);
 	printf(">> my_free(d)\n\n");
+	my_free((void*) d);
 	status();
 
-	char *e = (char*)my_malloc(80);
 	printf(">> char *e = (char*)my_malloc(80)\n\n");
+	char *e = (char*)my_malloc(80);
 	status();
 
-	my_free((void*)c);
 	printf(">> my_free(c)\n\n");
+	my_free((void*)c);
 	status();
 
-	my_free((void*)a);
 	printf(">> my_free(a)\n\n");
+	my_free((void*)a);
 	status();
 
-	my_free((void*)e);
 	printf(">> my_free(e)\n\n");
+	my_free((void*)e);
 	status();
 
 	char buffer[3];
