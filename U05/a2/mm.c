@@ -47,8 +47,8 @@ void initialize()
 
         b_initialized = 1;
         //INITIALISIERUNG VON HEAD
-        head->dataLength = memorySize-memoryBlockHeaderSize;
-        head->data = head+memoryBlockHeaderSize;
+        head->dataLength = memorySize-memoryBlockHeaderSize+1;
+        head->data = (void*)((char*)head+memoryBlockHeaderSize);
         head->state = not_allocated;
         head->nextBlock = NULL;
     }
@@ -64,9 +64,7 @@ int get_free_space()
     while(block != NULL)
     {
         if(block->state == not_allocated)
-        {
             count = count + block->dataLength;
-        }
         block = block->nextBlock;
     }
     return(count);
@@ -77,19 +75,15 @@ int get_free_space()
 void* my_malloc(int byteCount)
 {
     if(!b_initialized)
-    {
         initialize();
-    }
     //Wenn der insgesamt verfuegbare Speicherplatz kleiner ist
     //als der angeforderte, koennen wir gleich aufhoeren!
     if(byteCount > get_free_space())
-    {
         return(NULL);
-    }
-    memoryBlock* block = head;
 
     //SUCHE NACH EINEM GEEIGNETEN FREIEN SPEICHERBLOCK, MIT MEHR ALS <byteCount>
     //VIELEN BYTES
+    memoryBlock* block = head;
     while(block != NULL)
     {
         if(block->dataLength > byteCount && block->state == not_allocated)
@@ -101,12 +95,9 @@ void* my_malloc(int byteCount)
 
     //Der Knoten block hat genuegend Speicherplatz
     allocate_memory:
-        //UNTERTEILUNG DIESES BLOCKS, SO DASS NICHT UNNÖTIG VIEL SPEICHERPLATZ VERBRAUCHT WIRD
-        //UND MARKIERE DIESEN BLOCK
-        // memoryBlock* fitting_block = splitBlock(block, byteCount);
-        //RÜCKGABE DES ZEIGERS AUF DEN ZU BENUTZENDEN SPEICHERBEREICH
-        // return(fitting_block);
-        return splitBlock(block, byteCount);
+        // UNTERTEILUNG DIESES BLOCKS, SO DASS NICHT UNNÖTIG VIEL SPEICHERPLATZ VERBRAUCHT WIRD
+        // UND RÜCKGABE DES ZEIGERS AUF DEN ZU BENUTZENDEN SPEICHERBEREICH
+        return splitBlock(block, byteCount)->data;
 }
 
 //Sofern moeglich teilt die Funktion splitBlock einen Block in 2 Bloecke,
@@ -127,7 +118,7 @@ memoryBlock* splitBlock(memoryBlock* block, int byteCount)
     {
         memoryBlock *new_block = (void*)((char*)block->data+byteCount);
         new_block->dataLength = remainingDataLength-memoryBlockHeaderSize;
-        new_block->data = new_block+memoryBlockHeaderSize+byteCount;
+        new_block->data = (void*)((char*)new_block+memoryBlockHeaderSize);
         new_block->state = not_allocated;
         new_block->nextBlock = block->nextBlock;
         //LEGE DEN NEUEN BLOCK ALS NACHFOLGER VOM ALTEN BLOCK FEST
@@ -145,25 +136,23 @@ memoryBlock* splitBlock(memoryBlock* block, int byteCount)
 //miteinander verschmolzen werden.
 void my_free(void* p)
 {
+
     if(!b_initialized)
-    {
         return;
-    }
     // SUCHE NACH DEM BLOCK MIT ZEIGER <p>
     memoryBlock* block = head;
     while(block != NULL && block->data != p)
         block = block->nextBlock;
-
     // FALLS KEINER GEFUNDEN WURDE, GEBE EINE MELDUNG AUS.
     if(block == NULL)
-        printf("Not a valid pointer\n");
-    else
     {
-        //FREIGEBEN VON DEM ENTSPRECHENDEN SPEICHERBLOCK
-        block->state = not_allocated;
-        //FREIE SPEICHERBLOECKE MITEINANDER VERSCHMELZEN
-        mergeFreeBlocks();
+        printf("Not a valid pointer\n");
+        return;
     }
+    //FREIGEBEN VON DEM ENTSPRECHENDEN SPEICHERBLOCK
+    block->state = not_allocated;
+    //FREIE SPEICHERBLOECKE MITEINANDER VERSCHMELZEN
+    mergeFreeBlocks();
 }
 
 //Diese Funktion verschmilzt benachbarte, nicht benutzte Speicherbloecke
@@ -171,13 +160,12 @@ void mergeFreeBlocks()
 {
     // BEGINNE AM ANFANG DER LISTE
     memoryBlock* block = head;
-    while(block != NULL)
+    while(block->nextBlock != NULL)
     {
         // WENN DER AKTUELLE UND DER BENACHBARTE BLOCK FREI SIND,
         // DANN VERSCHMELZE DIESE INDEM DIE DATENLAENGE UND DER NACHFOLGER
         // VOM AKTUELLEN BLOCK ANGEPASST WERDEN.
-        if(block->state == not_allocated &&
-           block->nextBlock->state == not_allocated)
+        if(block->state == not_allocated && block->nextBlock->state == not_allocated)
         {
             block->dataLength = block->dataLength + block->nextBlock->dataLength;
             block->nextBlock = block->nextBlock->nextBlock;
@@ -199,12 +187,12 @@ void status()
     // printf("%d\n", memorySize);
     // printf("%d\n\n", memoryBlockHeaderSize);
 
-    printf("Uebersicht des Speichers: %d / %d Speicher frei\n", get_free_space(), memorySize);
-    printf("-----------------------------------------------------------------------------------\n");
-    printf("#  at\t\t allocated\t space\t data\t\t\t\tnext block\n");
+    printf("\tUebersicht des Speichers: %d / %d Speicher frei\n", get_free_space(), memorySize);
+    printf("\t-----------------------------------------------------------------------------------\n");
+    printf("\t#  at\t\t allocated\t space\t data\t\t\t\tnext block\n");
     while(block != NULL)
     {
-        printf("%d  %p\t %s \t\t %d\t [%11p,%11p]\t%p\n", ++count, block, boolStr[block->state], block->dataLength, (block->data), ((char*)block->data + block->dataLength-1), (block->nextBlock));
+        printf("\t%d  %p\t %s \t\t %d\t [%11p,%11p]\t%p\n", ++count, block, boolStr[block->state], block->dataLength, (block->data), ((char*)block->data + block->dataLength-1), (block->nextBlock));
         block = block->nextBlock;
     }
     printf("\n\n");
