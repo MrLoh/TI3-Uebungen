@@ -167,7 +167,7 @@ void mergeFreeBlocks()
         // VOM AKTUELLEN BLOCK ANGEPASST WERDEN.
         if(block->state == not_allocated && block->nextBlock->state == not_allocated)
         {
-            block->dataLength = block->dataLength + block->nextBlock->dataLength;
+            block->dataLength = block->dataLength + block->nextBlock->dataLength + memoryBlockHeaderSize;
             block->nextBlock = block->nextBlock->nextBlock;
             if(block->nextBlock == NULL)
                 return;
