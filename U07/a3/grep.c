@@ -1,26 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define MAX_LINE_SIZE 2048
 
-int write_grepped(FILE* file, const char* key)
+void grep(FILE* file, const char* key)
 {
 	if ( file )
 	{
-		while ( !feof(file) )
+		int linesize = 16;
+		char line[linesize];
+		int i = 0;
+		int c;
+		while ( (c = fgetc(file)) != EOF )
 		{
-			char buffer[MAX_LINE_SIZE];
-			fgets(buffer, MAX_LINE_SIZE, file);
-			if ( strstr(buffer, key) != NULL )
-				fputs(buffer, stdout);
-			memset(buffer, 0, MAX_LINE_SIZE);
+			line[i] = c;
+			i++;
+			if ( c == '\n' )
+			{
+				// test if line contains key
+				if ( strstr(line, key) != NULL )
+					fputs(line, stdout);
+				// clean up line to avoid leftovers in next
+				memset(line, 0, i);
+				i = 0;
+			}
+			if ( i+2 >= linesize)
+			{
+				// duplicate line size for too short line
+				linesize *= 2;
+				char temp[linesize];
+				strcpy(temp, line);
+				*line = *temp;
+			}
 		}
-		return EXIT_SUCCESS;
 	}
 	else
 	{
 		fputs("ERROR: no input file found\n", stderr);
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -30,19 +46,22 @@ int main(int argc, char const *argv[])
 
 	FILE *file;
 	if ( argc == 1 )
+	{
 		fputs("ERROR: not enough input given\n", stderr);
+		exit(EXIT_FAILURE);
+	}
 	else if ( argc == 2 )
 	{
 		// input in stdin
-		exit_code = write_grepped(stdin, argv[1]);
+		grep(stdin, argv[1]);
 	}
 	else
 	{
 		// filename in argv[2]
 		file = fopen(argv[2],"r");
-		exit_code = write_grepped(file, argv[1]);
+		grep(file, argv[1]);
 		fclose(file);
 	}
 
-	return exit_code;
+	return EXIT_SUCCESS;
 }

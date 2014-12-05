@@ -1,18 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#define TRUE 1
-#define FALSE 0
 
-void write_stats(FILE* file)
+void wc(FILE* file)
 {
-	int lines = 1;
-	int words = 0;
-	int chars = 0;
 	if ( file )
 	{
+		int lines = 1;
+		int words = 0;
+		int chars = 0;
+		int lastwasspace = 1;
 		int c;
-		int lastwasspace = TRUE;
 		while ( (c = fgetc(file)) != EOF )
 		{
 			chars++;
@@ -31,7 +29,6 @@ void write_stats(FILE* file)
 		fputs("ERROR: no input given\n", stderr);
 		exit(EXIT_FAILURE);
 	}
-
 }
 
 int main(int argc, char const *argv[])
@@ -39,13 +36,13 @@ int main(int argc, char const *argv[])
 	if ( argc == 1 )
 	{
 		// input in stdin
-		write_stats(stdin);
+		wc(stdin);
 	}
 	else
 	{
 		// filename in argv[1]
 		FILE *file = fopen(argv[1],"r");
-		write_stats(file);
+		wc(file);
 		fclose(file);
 	}
 
