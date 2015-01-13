@@ -10,7 +10,6 @@ h1 {
 figure, img {
     width: 100%;
     margin: 0;
-    transition: all 0.5s;
 }
 figure figcaption {
     opacity: 0;
@@ -18,17 +17,19 @@ figure figcaption {
 }
 figure:hover figcaption {
     opacity: 1;
-    transform: translateY(-50px);
+    color: black;
+    transform: translateY(-40px);
+    -webkit-transform: translateY(-40px);
 }
 a {
     color: DarkGoldenRod;
     text-decoration: none;
     transition: all 0.5s;
 }
-a:hover {
+p > a:hover {
     color: LightSteelBlue;
 }
 .right {
-    float: right;
+    text-align: right;
     font-size: 0.7em;
 }
